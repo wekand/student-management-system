@@ -8,84 +8,66 @@ students = [
 
 #查询
 def lookup_student():
-    #类型转换
-    try:
-        id_look=int(input("请输入要查询的学号："))
-    except ValueError:
-        print("请输入数字")
-    else:
-        #设置标志
-        flag= False
-        for student in students:
-            if student["id"] == id_look:
-                print(student["name"], student["score"])
-                flag= True
-        if not flag:
-            print(f"没有找到学号为{id_look}的学生")
+    id_look=get_integer("请输入要查询的学号：")
+    #设置标志
+    flag= False
+    for student in students:
+        if student["id"] == id_look:
+            print(student["name"], student["score"])
+            flag= True
+    if not flag:
+        print(f"没有找到学号为{id_look}的学生")
+
 
 
 #添加
 def insert_student():
-    try:
-        id_insert = int(input("请输入学号："))
-    except ValueError:
-        print("请输入数字")
-    else:
-        flag= False
-        for student in students:
-            if student["id"] == id_insert:
-                print("学号已经存在，不能重复添加")
-                flag= True
-        if not flag:
-            name_insert = input("请输入名字：")
-            try:
-                score_insert = int(input("请输入分数："))
-            except ValueError:
-                  print("请输入数字")
-            else:
-                students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
+    id_insert=get_integer("请输入要添加的学号：")
+    flag= False
+    for student in students:
+        if student["id"] == id_insert:
+            print("学号已经存在，不能重复添加")
+            flag= True
+    if not flag:
+        name_insert = input("请输入名字：")
+        score_insert =get_score("请输入分数：")
+        students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
 
 
 
 #删除学生
 def delete_student():
-    try:
-        id_delete=int(input("请输入要删除的学号："))
-    except ValueError:
-        print("请输入数字")
-    else:
-        flag= False
-        for student in students:
-            if student["id"] == id_delete:
-                students.remove(student)
-                flag= True
-        if not flag:
-            print("没有找到该学生，删除失败")
+    id_delete=get_integer("请输入要删除的学号：")
+    flag= False
+    for student in students:
+        if student["id"] == id_delete:
+            students.remove(student)
+            flag= True
+    if not flag:
+        print("没有找到该学生，删除失败")
+
 
 #修改学生
 def update_student():
-    try:
-        id_update=int(input("请输入要更新的学号："))
-    except ValueError:
-        print("请输入数字")
-    else:
-        flag= False
-        for student in students:
-            if student["id"] == id_update:
-                name_update=input("请输入新的姓名：")
-                flag= True
-                try:
-                    score_update=int(input("请输入新的成绩："))
-                except ValueError:
-                    print("请输入数字")
-                else:
-                    if 0<=score_update<=100:
-                       student['score']=score_update
-                       student['name'] = name_update
-                    else:
-                        print("成绩必须在0~100之间")
-        if not flag:
-            print("没有找到该学生")
+    id_update=get_integer("请输入要更新的学号：")
+    flag= False
+    for student in students:
+        if student["id"] == id_update:
+            flag= True
+            name_update=input("请输入新的姓名：")
+            score_update=get_score("请输入新的成绩：")
+            student['score']=score_update
+            student['name']=name_update
+    if not flag:
+        print("没有找到该学生")
+
+def get_score(message):
+    while True:
+        score=get_integer(message)
+        if 0<=score<=100:
+            return score
+        else:
+            print("成绩必须在0~100之间")
 
 
 #显示所有学生
@@ -93,6 +75,14 @@ def show_students():
     for student in students:
         print(student["id"], student["name"], student["score"])
 
+def get_integer(message):
+    while True:
+        try:
+            integer= int(input(message))
+        except ValueError:
+            print("请输入数字")
+        else:
+            return integer
 
 #显示菜单
 def show_menu():
