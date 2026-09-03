@@ -9,40 +9,60 @@ students = [
 #查询
 def lookup_student():
     #类型转换
-    id_look=int(input("请输入要查询的学号："))
-    #设置标志
-    flag= False
-    for student in students:
-        if student["id"] == id_look:
-            print(student["name"], student["score"])
-            flag= True
-    if not flag:
+    try:
+        id_look=int(input("请输入要查询的学号："))
+    except ValueError:
+        print("请输入数字")
+    else:
+        #设置标志
+        flag= False
+        for student in students:
+            if student["id"] == id_look:
+                print(student["name"], student["score"])
+                flag= True
+        if not flag:
             print(f"没有找到学号为{id_look}的学生")
+
 
 #添加
 def insert_student():
-    id_insert = int(input("请输入学号："))
-    flag= False
-    for student in students:
-        if student["id"] == id_insert:
-            print("学号已经存在，不能重复添加")
-            flag= True
-    if not flag:
-        name_insert = input("请输入名字：")
-        score_insert = int(input("请输入分数："))
-        students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
+    try:
+        id_insert = int(input("请输入学号："))
+    except ValueError:
+        print("请输入数字")
+    else:
+        flag= False
+        for student in students:
+            if student["id"] == id_insert:
+                print("学号已经存在，不能重复添加")
+                flag= True
+        if not flag:
+            name_insert = input("请输入名字：")
+            try:
+                score_insert = int(input("请输入分数："))
+            except ValueError:
+                  print("请输入数字")
+            else:
+                students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
+
 
 
 #删除学生
 def delete_student():
-    id_delete=int(input("请输入要删除的学号："))
-    flag= False
-    for student in students:
-        if student["id"] == id_delete:
-            students.remove(student)
-            flag= True
-    if not flag:
-        print("没有找到该学生，删除失败")
+    try:
+        id_delete=int(input("请输入要删除的学号："))
+    except ValueError:
+        print("请输入数字")
+    else:
+        flag= False
+        for student in students:
+            if student["id"] == id_delete:
+                students.remove(student)
+                flag= True
+        if not flag:
+            print("没有找到该学生，删除失败")
+
+
 
 #显示所有学生
 def show_students():
