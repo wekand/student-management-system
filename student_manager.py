@@ -62,6 +62,30 @@ def delete_student():
         if not flag:
             print("没有找到该学生，删除失败")
 
+#修改学生
+def update_student():
+    try:
+        id_update=int(input("请输入要更新的学号："))
+    except ValueError:
+        print("请输入数字")
+    else:
+        flag= False
+        for student in students:
+            if student["id"] == id_update:
+                name_update=input("请输入新的姓名：")
+                flag= True
+                try:
+                    score_update=int(input("请输入新的成绩："))
+                except ValueError:
+                    print("请输入数字")
+                else:
+                    if 0<=score_update<=100:
+                       student['score']=score_update
+                       student['name'] = name_update
+                    else:
+                        print("成绩必须在0~100之间")
+        if not flag:
+            print("没有找到该学生")
 
 
 #显示所有学生
@@ -78,8 +102,9 @@ def show_menu():
     print("1. 添加学生")
     print("2. 查询学生")
     print("3. 删除学生")
-    print("4. 显示所有学生")
-    print("5. 退出")
+    print("4. 修改学生")
+    print("5. 显示所有学生")
+    print("6. 退出")
 
 def main():
     while True:
@@ -92,8 +117,10 @@ def main():
         elif num_chose == "3":
             delete_student()
         elif num_chose == "4":
-            show_students()
+            update_student()
         elif num_chose == "5":
+            show_students()
+        elif num_chose == "6":
             break
 
 
