@@ -1,91 +1,12 @@
-import json
+from storage import load_students, save_students
 
-#查询
-def lookup_student(students):
-    id_look=get_integer("请输入要查询的学号：")
-    #设置标志
-    flag= False
-    for student in students:
-        if student["id"] == id_look:
-            print(student["name"], student["score"])
-            flag= True
-    if not flag:
-        print(f"没有找到学号为{id_look}的学生")
+from student_service import (
+    insert_student,
+    lookup_student,
+    delete_student,
+    update_student
+)
 
-#加载数据
-def load_students():
-    try:
-        with open('students.json','r',encoding='utf-8') as f:
-            students = json.load(f)
-            return students
-    except FileNotFoundError:
-        #学生的数据结构设计(创建 students 列表)
-        students = [
-            {"id": 101, "name": "张三", "score": 80},
-            {"id": 102, "name": "李四", "score": 90},
-            {"id": 103, "name": "王五", "score": 75}
-        ]
-        save_students(students)
-        return students
-    except json.JSONDecodeError:
-        print("json文件解析失败")
-        return None
-
-#保存数据
-def save_students(students):
-    with open('students.json', 'w', encoding='utf-8') as f:
-        json.dump(students, f, ensure_ascii=False, indent=4)
-
-#添加
-def insert_student(students):
-    id_insert=get_integer("请输入要添加的学号：")
-    for student in students:
-        if student["id"] == id_insert:
-            print("学号已经存在，不能重复添加")
-            return False
-    name_insert = input("请输入名字：")
-    score_insert =get_score("请输入分数：")
-    students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
-    return True
-
-
-
-#删除学生
-def delete_student(students):
-    id_delete=get_integer("请输入要删除的学号：")
-
-    for student in students:
-        if student["id"] == id_delete:
-            students.remove(student)
-            return True
-
-    print("没有找到该学生，删除失败")
-    return False
-
-
-#修改学生
-def update_student(students):
-    id_update=get_integer("请输入要更新的学号：")
-
-    for student in students:
-        if student["id"] == id_update:
-
-            name_update=input("请输入新的姓名：")
-            score_update=get_score("请输入新的成绩：")
-            student['score']=score_update
-            student['name']=name_update
-            return True
-
-    print("没有找到该学生")
-    return False
-
-def get_score(message):
-    while True:
-        score=get_integer(message)
-        if 0<=score<=100:
-            return score
-        else:
-            print("成绩必须在0~100之间")
 
 
 #显示所有学生
@@ -93,14 +14,6 @@ def show_students(students):
     for student in students:
         print(student["id"], student["name"], student["score"])
 
-def get_integer(message):
-    while True:
-        try:
-            integer= int(input(message))
-        except ValueError:
-            print("请输入数字")
-        else:
-            return integer
 
 #显示菜单
 def show_menu():
