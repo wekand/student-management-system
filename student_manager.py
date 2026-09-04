@@ -1,13 +1,7 @@
-
-#学生的数据结构设计(创建 students 列表)
-students = [
-    {"id": 101, "name": "张三", "score": 80},
-    {"id": 102, "name": "李四", "score": 90},
-    {"id": 103, "name": "王五", "score": 75}
-]
+import json
 
 #查询
-def lookup_student():
+def lookup_student(students):
     id_look=get_integer("请输入要查询的学号：")
     #设置标志
     flag= False
@@ -18,48 +12,72 @@ def lookup_student():
     if not flag:
         print(f"没有找到学号为{id_look}的学生")
 
+#加载数据
+def load_students():
+    try:
+        with open('students.json','r',encoding='utf-8') as f:
+            students = json.load(f)
+            return students
+    except FileNotFoundError:
+        #学生的数据结构设计(创建 students 列表)
+        students = [
+            {"id": 101, "name": "张三", "score": 80},
+            {"id": 102, "name": "李四", "score": 90},
+            {"id": 103, "name": "王五", "score": 75}
+        ]
+        save_students(students)
+        return students
+    except json.JSONDecodeError:
+        print("json文件解析失败")
+        return None
 
+#保存数据
+def save_students(students):
+    with open('students.json', 'w', encoding='utf-8') as f:
+        json.dump(students, f, ensure_ascii=False, indent=4)
 
 #添加
-def insert_student():
+def insert_student(students):
     id_insert=get_integer("请输入要添加的学号：")
-    flag= False
     for student in students:
         if student["id"] == id_insert:
             print("学号已经存在，不能重复添加")
-            flag= True
-    if not flag:
-        name_insert = input("请输入名字：")
-        score_insert =get_score("请输入分数：")
-        students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
+            return False
+    name_insert = input("请输入名字：")
+    score_insert =get_score("请输入分数：")
+    students.append( {"id": id_insert, "name":name_insert , "score": score_insert})
+    return True
 
 
 
 #删除学生
-def delete_student():
+def delete_student(students):
     id_delete=get_integer("请输入要删除的学号：")
-    flag= False
+
     for student in students:
         if student["id"] == id_delete:
             students.remove(student)
-            flag= True
-    if not flag:
-        print("没有找到该学生，删除失败")
+            return True
+
+    print("没有找到该学生，删除失败")
+    return False
 
 
 #修改学生
-def update_student():
+def update_student(students):
     id_update=get_integer("请输入要更新的学号：")
-    flag= False
+
     for student in students:
         if student["id"] == id_update:
-            flag= True
+
             name_update=input("请输入新的姓名：")
             score_update=get_score("请输入新的成绩：")
             student['score']=score_update
             student['name']=name_update
-    if not flag:
-        print("没有找到该学生")
+            return True
+
+    print("没有找到该学生")
+    return False
 
 def get_score(message):
     while True:
@@ -71,7 +89,7 @@ def get_score(message):
 
 
 #显示所有学生
-def show_students():
+def show_students(students):
     for student in students:
         print(student["id"], student["name"], student["score"])
 
@@ -97,22 +115,30 @@ def show_menu():
     print("6. 退出")
 
 def main():
+    students= load_students()
+    if students is None:
+        return
     while True:
         show_menu()
         num_chose=input("请选择：")
         if num_chose == "1":
-            insert_student()
+            result=insert_student(students)
+            if result:
+                save_students(students)
         elif num_chose == "2":
-            lookup_student()
+            lookup_student(students)
         elif num_chose == "3":
-            delete_student()
+            result=delete_student(students)
+            if result:
+                save_students(students)
         elif num_chose == "4":
-            update_student()
+            result=update_student(students)
+            if result:
+                save_students(students)
         elif num_chose == "5":
-            show_students()
+            show_students(students)
         elif num_chose == "6":
             break
-
 
 
 if __name__ == "__main__":
