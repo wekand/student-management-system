@@ -12,7 +12,7 @@ from student_service import (
 #显示所有学生
 def show_students(students):
     for student in students:
-        print(student["id"], student["name"], student["score"])
+        print(student.id, student.name, student.score)
 
 
 #显示菜单
