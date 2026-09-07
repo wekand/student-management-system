@@ -1,6 +1,4 @@
 import json
-
-from debug import dict_to_students
 from student import Student
 
 

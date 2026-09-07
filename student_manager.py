@@ -1,4 +1,5 @@
-from storage import load_students, save_students
+from storage import load_students
+from operation import execute_with_save
 
 from student_service import (
     insert_student,
@@ -35,24 +36,23 @@ def main():
         show_menu()
         num_chose=input("请选择：")
         if num_chose == "1":
-            result=insert_student(students)
-            if result:
-                save_students(students)
+            result=execute_with_save(students,insert_student)
+            if result==2:
+                print("保存失败，数据已回滚")
         elif num_chose == "2":
             lookup_student(students)
         elif num_chose == "3":
-            result=delete_student(students)
-            if result:
-                save_students(students)
+            result=execute_with_save(students,delete_student)
+            if result == 2:
+                print("保存失败，数据已回滚")
         elif num_chose == "4":
-            result=update_student(students)
-            if result:
-                save_students(students)
+            result=execute_with_save(students, update_student)
+            if result == 2:
+                print("保存失败，数据已回滚")
         elif num_chose == "5":
             show_students(students)
         elif num_chose == "6":
             break
-
 
 if __name__ == "__main__":
             main()

@@ -1,3 +1,4 @@
+
 class Student:
     def __init__(self, id, name, score):
         self.id = id
@@ -12,5 +13,6 @@ class Student:
 
     def is_passed(self):
         return self.score >= 60
+
 
 
