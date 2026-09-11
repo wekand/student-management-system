@@ -1,7 +1,6 @@
 import json
 from student import Student
 
-
 def student_to_dict(student):
     student={"id":student.id,"name":student.name,"score":student.score}
     return student
@@ -31,18 +30,22 @@ def load_students():
             return students
     except FileNotFoundError:
         students = [
-            {"id": 101, "name": "张三", "score": 80},
-            {"id": 102, "name": "李四", "score": 90},
-            {"id": 103, "name": "王五", "score": 75}
+            Student(101, "张三", 80),
+            Student(102, "李四", 90),
+            Student(103, "王五", 75)
         ]
-        students = dict_to_students(students)
         save_students(students)
         return students
     except json.JSONDecodeError:
         print("json文件解析失败")
         return None
+# def save_students(students):
+#     raise PermissionError("模拟保存失败")
 
 def save_students(students):
     students=students_to_dict(students)
     with open('students.json','w',encoding='utf-8') as f:
         json.dump(students,f,ensure_ascii=False,indent=4)
+
+students = load_students()
+
