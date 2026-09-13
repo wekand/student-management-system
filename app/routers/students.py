@@ -1,57 +1,64 @@
 from fastapi import APIRouter,HTTPException
-from pydantic import BaseModel
-from app.service.student_service import add_student, lookup_student, remove_student, modify_student
+from typing import Annotated
+from pydantic import BaseModel, Field
+from app.service.student_service import add_student, lookup_student, remove_student, modify_student, \
+    StudentAlreadyExistsError, StudentNotFoundError
+
+Score = Annotated[int, Field(ge=0, le=100)]
 
 class StudentData(BaseModel):
     id: int
     name: str
+    score: Score
+
+class StudentResponse(BaseModel):
+    id: int
+    name: str
     score: int
 
+class MessageResponse(BaseModel):
+    message: str
+
+class StudentUpdate(BaseModel):
+    name: str
+    score: Score
 router = APIRouter()
 @router.get("/hello")
 async def hello():
     return {"message": "Hello FastAPI"}
 
-@router.get("/students/{id}")
-async def get_student(id: int):
-    result=lookup_student(id)
+@router.get("/students/{id}", response_model=StudentResponse)
+async def get_student(student_id: int):
+    result = lookup_student(student_id)
+
     if result is None:
-        raise HTTPException(status_code=404, detail="Student Not Found")
-    return {"id":result.id,"name":result.name,"score":result.score}
+        raise HTTPException(
+            status_code=404,
+            detail="Student Not Found"
+        )
 
-@router.post("/students",status_code=201)
-async def create_student(student_add: StudentData):
+    return result
+
+@router.post("/students",status_code=201,response_model=MessageResponse)
+async def create_student(student: StudentData):
     try:
-        result = add_student(student_add)
-        if not result:
-            raise HTTPException(status_code=409, detail="Student Already Exists")
+        add_student(student)
         return {"message": "已成功添加"}
-    except PermissionError:
-        raise HTTPException(status_code=500,detail="Failed to Save Student Data")
+    except StudentAlreadyExistsError:
+        raise HTTPException(status_code=409, detail="Student Already Exists")
 
 
-@router.delete("/students/{id}", status_code=200)
-async def delete_student(id: int):
+@router.delete("/students/{id}", status_code=200,response_model=MessageResponse)
+async def delete_student(student_id: int):
     try:
-        result=remove_student(id)
-        if not result:
-            raise HTTPException(status_code=404, detail="Student Not Found")
+        remove_student(student_id)
         return {"message": "已成功删除"}
-    except PermissionError:
-        raise HTTPException(status_code=500, detail="Failed to Save Student Data")
-
-
-class StudentUpdate(BaseModel):
-    name: str
-    score: int
-
-
-@router.put("/students/{id}",status_code=200)
-async def update_student(id: int, student_update: StudentUpdate):
-    try:
-        result = modify_student(id,name=student_update.name,score=student_update.score)
-        if result:
-            return {"message": "已成功修改"}
+    except StudentNotFoundError:
         raise HTTPException(status_code=404, detail="Student Not Found")
-    except PermissionError:
-        raise HTTPException(status_code=500, detail="Failed to Save Student Data")
+@router.put("/students/{id}",status_code=200,response_model=MessageResponse)
+async def update_student(student_id: int, student_update: StudentUpdate):
+    try:
+        modify_student(student_id,name=student_update.name,score=student_update.score)
+        return {"message": "已成功修改"}
+    except StudentNotFoundError:
+        raise HTTPException(status_code=404, detail="Student Not Found")

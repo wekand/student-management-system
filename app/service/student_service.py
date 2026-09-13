@@ -1,26 +1,35 @@
+from pymysql import IntegrityError
 from app.repositories.student_repository import insert_student, get_student, delete_student, update_student
-from app.service.operation import execute_with_save
+class StudentAlreadyExistsError(Exception):
+    pass
 
 #查询
-def lookup_student(id):
-    result=get_student(id)
-    return result
-
+def lookup_student(student_id):
+    return get_student(student_id)
 
 
 #删除学生
-def remove_student(id):
-    result = execute_with_save(lambda:delete_student(id))
-    return result
-
-
+def remove_student(student_id):
+    result = delete_student(student_id)
+    if result == 0:
+        raise StudentNotFoundError("学生未找到")
 
 #修改学生
-def modify_student(id, name, score):
-    result=execute_with_save(lambda:update_student(id, name, score))
-    return result
+class StudentNotFoundError(Exception):
+    pass
+
+
+def modify_student(student_id, name, score):
+    result=update_student(student_id, name, score)
+    if result==0:
+        raise StudentNotFoundError("学生未找到")
 
 #添加学生
 def add_student(student):
-    result = execute_with_save(lambda: insert_student(student))
-    return result
+    try:
+        insert_student(student)
+    except IntegrityError:
+        raise StudentAlreadyExistsError("学生已存在")
+
+
+

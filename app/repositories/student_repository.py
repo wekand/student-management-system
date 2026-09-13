@@ -1,29 +1,69 @@
-from app.storage import storage
+
+from app.database.connection import get_connection
+from app.models.student import Student
 def insert_student(student):
-    for orl_student in storage.students:
-        if orl_student.id== student.id:
-            return False
-    storage.students.append(student)
-    return True
+    conn = get_connection()
+    cursor = conn.cursor()
+    sql="INSERT INTO students (id, name, score) VALUES (%s, %s, %s)"
+    cursor.execute(sql, (student.id, student.name, student.score))
+    conn.commit()
+    cursor.close()
+    conn.close()
 
-def get_student(id):
-    for student in storage.students:
-        if student.id == id:
-            return student
-    return None
 
-def delete_student(id):
-    for student in storage.students:
-        if student.id == id:
-            storage.students.remove(student)
-            return True
-    return False
 
-def update_student(id,name,score):
-    for student in storage.students:
-        if student.id == id:
-            student.score = score
-            student.name = name
-            return True
-    return False
+
+def get_student(student_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    sql = "SELECT id, name, score FROM students WHERE id = %s"
+    cursor.execute(sql, (student_id,))
+    result = cursor.fetchone()
+
+    if result:
+        student=Student(result[0],result[1],result[2])
+    else:
+        student=None
+    cursor.close()
+    conn.close()
+    return student
+
+
+def delete_student(student_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        sql = "DELETE FROM students WHERE id = %s"
+        cursor.execute(sql, (student_id,))
+        conn.commit()
+        return cursor.rowcount
+    finally:
+        cursor.close()
+        conn.close()
+
+
+
+
+def update_student(student_id, name, score):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        sql = """
+        UPDATE students
+        SET name = %s, score = %s
+        WHERE id = %s
+        """
+        cursor.execute(sql, (name, score, student_id))
+        conn.commit()
+        return cursor.rowcount
+    finally:
+        cursor.close()
+        conn.close()
+
+
+
+
+
+
 
