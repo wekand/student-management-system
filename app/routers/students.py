@@ -1,6 +1,9 @@
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import Annotated
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
+
+from app.database.session import get_db
 from app.service.student_service import add_student, lookup_student, remove_student, modify_student, \
     StudentAlreadyExistsError, StudentNotFoundError
 
@@ -28,8 +31,8 @@ async def hello():
     return {"message": "Hello FastAPI"}
 
 @router.get("/students/{id}", response_model=StudentResponse)
-async def get_student(student_id: int):
-    result = lookup_student(student_id)
+async def get_student(student_id: int,db:Session=Depends(get_db)):
+    result = lookup_student(db,student_id)
 
     if result is None:
         raise HTTPException(
@@ -40,25 +43,25 @@ async def get_student(student_id: int):
     return result
 
 @router.post("/students",status_code=201,response_model=MessageResponse)
-async def create_student(student: StudentData):
+async def create_student(student: StudentData,db:Session=Depends(get_db)):
     try:
-        add_student(student)
+        add_student(db,student)
         return {"message": "已成功添加"}
     except StudentAlreadyExistsError:
         raise HTTPException(status_code=409, detail="Student Already Exists")
 
 
 @router.delete("/students/{id}", status_code=200,response_model=MessageResponse)
-async def delete_student(student_id: int):
+async def delete_student(student_id: int,db:Session=Depends(get_db)):
     try:
-        remove_student(student_id)
+        remove_student(db,student_id)
         return {"message": "已成功删除"}
     except StudentNotFoundError:
         raise HTTPException(status_code=404, detail="Student Not Found")
 @router.put("/students/{id}",status_code=200,response_model=MessageResponse)
-async def update_student(student_id: int, student_update: StudentUpdate):
+async def update_student(student_id: int, student_update: StudentUpdate,db:Session=Depends(get_db)):
     try:
-        modify_student(student_id,name=student_update.name,score=student_update.score)
+        modify_student(db,student_id,student_update.name,student_update.score)
         return {"message": "已成功修改"}
     except StudentNotFoundError:
         raise HTTPException(status_code=404, detail="Student Not Found")

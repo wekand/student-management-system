@@ -1,5 +1,5 @@
 import json
-from student import Student
+from app.models.student import Student
 
 def student_to_dict(student):
     student={"id":student.id,"name":student.name,"score":student.score}
