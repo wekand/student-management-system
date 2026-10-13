@@ -42,7 +42,7 @@ def modify_student(db,student_id, name, score):
 #添加学生
 def add_student(db,student):
     try:
-        student=Student(student.id,student.name,student.score)
+        student=Student(id=student.id,name=student.name,score=student.score)
         insert_student(db,student)
         db.commit()
     except IntegrityError:

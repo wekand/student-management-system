@@ -30,7 +30,7 @@ router = APIRouter()
 async def hello():
     return {"message": "Hello FastAPI"}
 
-@router.get("/students/{id}", response_model=StudentResponse)
+@router.get("/students/{student_id}", response_model=StudentResponse)
 async def get_student(student_id: int,db:Session=Depends(get_db)):
     result = lookup_student(db,student_id)
 
@@ -51,14 +51,14 @@ async def create_student(student: StudentData,db:Session=Depends(get_db)):
         raise HTTPException(status_code=409, detail="Student Already Exists")
 
 
-@router.delete("/students/{id}", status_code=200,response_model=MessageResponse)
+@router.delete("/students/{student_id}", status_code=200,response_model=MessageResponse)
 async def delete_student(student_id: int,db:Session=Depends(get_db)):
     try:
         remove_student(db,student_id)
         return {"message": "已成功删除"}
     except StudentNotFoundError:
         raise HTTPException(status_code=404, detail="Student Not Found")
-@router.put("/students/{id}",status_code=200,response_model=MessageResponse)
+@router.put("/students/{student_id}",status_code=200,response_model=MessageResponse)
 async def update_student(student_id: int, student_update: StudentUpdate,db:Session=Depends(get_db)):
     try:
         modify_student(db,student_id,student_update.name,student_update.score)

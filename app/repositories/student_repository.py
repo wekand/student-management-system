@@ -22,7 +22,6 @@ def delete_student(db,student_id):
 
 
 
-
 def update_student(db,student_id, name, score):
    student=db.get(Student,student_id)
    if student is not None:
